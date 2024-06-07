@@ -16,3 +16,9 @@ class User {
         required this.password});
         
 }
+
+extension ValidUsersExtension on List<User> {
+  void add(User user) {
+    this.add(user);
+  }
+}
