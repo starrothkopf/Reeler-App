@@ -1,37 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_signup/models/user.dart';
-import 'package:flutter_signup/screens/sign_up.dart';
-import 'package:flutter_signup/screens/success.dart';
 import 'package:flutter_signup/widgets/styled_form_field.dart';
+import 'package:flutter_signup/models/user_provider.dart';
+import 'package:provider/provider.dart';
 
-class SignIn extends StatefulWidget {
-  final User currentUser;
-  final List<User> validUsers;
-
-  const SignIn({super.key, required this.currentUser, required this.validUsers});
-
-  @override
-  State<SignIn> createState() => _SignInState();
-}
-
-class _SignInState extends State<SignIn> {
-
+class SignIn extends StatelessWidget {
+  SignIn({super.key});
+ 
   final _formGlobalKey = GlobalKey<FormState>();
 
   static const double _paddingHeight = 20.0;
   static const Color _tempoOrange =  Color.fromARGB(255, 248, 84, 4);
 
-  User? findUserByEmail(String email) {
-    for (User user in widget.validUsers) {
-      if (user.email == email) {
-        return user;
-      }
-    }
-    return null;
-  }
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     return Scaffold(
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -80,6 +65,7 @@ class _SignInState extends State<SignIn> {
                           const SizedBox(height: 8),
                           StyledFormField(
                             child: TextFormField(
+                                controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: const InputDecoration(
                                   isDense: true,
@@ -95,9 +81,6 @@ class _SignInState extends State<SignIn> {
                                   } 
                                   return null;
                                 },
-                                onSaved: (value) {
-                                  widget.currentUser.email = value!;
-                                },
                               ),
                           ),
                           const SizedBox(height: _paddingHeight),
@@ -105,6 +88,7 @@ class _SignInState extends State<SignIn> {
                           const SizedBox(height: 8),
                           StyledFormField(
                             child: TextFormField(
+                                controller: _passwordController,
                                 keyboardType: TextInputType.visiblePassword,
                                 obscureText: true,
                                 decoration: InputDecoration(
@@ -134,9 +118,6 @@ class _SignInState extends State<SignIn> {
                                   } 
                                   return null;
                                 },
-                                onChanged: (value) {
-                                  widget.currentUser.password = value;
-                                },
                               ),
                           ),
                           const SizedBox(height: _paddingHeight),
@@ -146,21 +127,10 @@ class _SignInState extends State<SignIn> {
                               onPressed: () {
                                 if (_formGlobalKey.currentState!.validate()) {
                                   _formGlobalKey.currentState!.save();
-                                  User? foundUser = findUserByEmail(widget.currentUser.email);
-                                  if (foundUser != null) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Success(currentUser: foundUser, validUsers: widget.validUsers),
-                                      ),
-                                    );
+                                  if (userProvider.signIn(_emailController.text, _passwordController.text)) {
+                                    Navigator.pushNamed(context, '/success');
                                   } else {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SignUp(currentUser: widget.currentUser, validUsers: widget.validUsers),
-                                      ),
-                                    );
+                                    Navigator.pushReplacementNamed(context, '/');
                                   }
                                 }
                               },
@@ -204,12 +174,7 @@ class _SignInState extends State<SignIn> {
                                 ),
                               ),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignUp(currentUser: widget.currentUser, validUsers: widget.validUsers),
-                                  ),
-                                );
+                                Navigator.pushReplacementNamed(context, '/');
                               }, 
                             ),
                           ],

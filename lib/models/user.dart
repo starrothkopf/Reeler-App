@@ -2,8 +2,8 @@ class User {
   String firstName;
   String lastName;
   String email;
-  int month;
-  int day;
+  String month;
+  String day;
   String year;
   String password;
 

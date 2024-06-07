@@ -1,43 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_signup/models/user.dart';
-import 'package:flutter_signup/screens/sign_in.dart';
-import 'package:flutter_signup/screens/success.dart';
+import 'package:flutter_signup/models/user_provider.dart';
 import 'package:flutter_signup/widgets/styled_form_field.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+// import 'package:flutter_signup/services/email_verification.dart';
 
-class SignUp extends StatefulWidget {
-  final User currentUser;
-  final List<User> validUsers;
-  
-  const SignUp({super.key, required this.currentUser, required this.validUsers});
-
-  @override
-  State<SignUp> createState() => _SignUpState();
+// toggle password show/hide and form checkbox
+class BoolToggle with ChangeNotifier {
+  bool _value = true;
+  bool get value => _value;
+  void toggle() { 
+    _value = !_value;
+    notifyListeners();
+  }
 }
 
-class _SignUpState extends State<SignUp> {
+class SignUp extends StatelessWidget {
+  SignUp({super.key});
 
   final _formGlobalKey = GlobalKey<FormState>();
-
-  static final List<int> _validMonths = List.generate(12, (index) => index + 1);
-  static final List<int> _validDays = List.generate(31, (index) => index + 1);
 
   static const double _paddingHeight = 20.0;
   static const Color _tempoOrange =  Color.fromARGB(255, 248, 84, 4);
 
-  bool _checkboxValue = false;
-  String _confirmPassword = '';
-  bool _obscured = true;
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _monthController = TextEditingController();
+  final TextEditingController _dayController = TextEditingController();
+  final TextEditingController _yearController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
-  void _toggleObscured() { // toggles password show/hide
-    setState(() {
-      _obscured = !_obscured;
-    });
-  }
+
+  // final TextEditingController _emailController = TextEditingController();
+  // final VerifaliaService _verifaliaService = VerifaliaService();
+  // bool _isValid = false;
+
+  // void _verifyEmail(String email) async {
+  //   try {
+  //     final isValid = await _verifaliaService.verifyEmail(email);
+  //     setState(() {
+  //       _isValid = isValid;
+  //     });
+  //   } catch (e) {
+  //     print('Error verifying email: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final obscure = Provider.of<BoolToggle>(context);
+    final checkbox = Provider.of<BoolToggle>(context);
+    
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -80,8 +98,8 @@ class _SignUpState extends State<SignUp> {
                             Expanded(
                               flex: 1,
                               child: StyledFormField(
-
                                 child: TextFormField(
+                                  controller: _firstNameController,
                                   keyboardType: TextInputType.name,
                                   decoration: const InputDecoration(
                                     isDense: true,
@@ -95,9 +113,6 @@ class _SignUpState extends State<SignUp> {
                                     } 
                                     return null;
                                   },
-                                  onSaved: (value) {
-                                    widget.currentUser.firstName = value!;
-                                  },
                                 ),
                               ),
                             ),
@@ -106,6 +121,7 @@ class _SignUpState extends State<SignUp> {
                               flex: 1,
                               child: StyledFormField(
                                 child: TextFormField(
+                                  controller: _lastNameController,
                                   keyboardType: TextInputType.name,
                                   decoration: const InputDecoration(
                                     isDense: true,
@@ -119,9 +135,6 @@ class _SignUpState extends State<SignUp> {
                                     } 
                                     return null;
                                   },
-                                  onSaved: (value) {
-                                    widget.currentUser.lastName = value!;
-                                  },
                                 ),
                               ),
                             ),
@@ -130,6 +143,7 @@ class _SignUpState extends State<SignUp> {
                         const SizedBox(height: _paddingHeight),
                         StyledFormField(
                           child: TextFormField(
+                              controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               decoration: const InputDecoration(
                                 isDense: true,
@@ -140,13 +154,10 @@ class _SignUpState extends State<SignUp> {
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter email';
-                                } else if (!value.contains('@') || !value.contains('.') || value.length < 6) {
+                                } else if (!value.contains('@') || !value.contains('.')) { // _isValid
                                   return 'Please enter a valid email';
                                 } 
                                 return null;
-                              },
-                              onSaved: (value) {
-                                widget.currentUser.email = value!;
                               },
                             ),
                         ),
@@ -158,54 +169,22 @@ class _SignUpState extends State<SignUp> {
                             Expanded(
                               flex: 1,
                               child: StyledFormField(
-                                child: DropdownButtonFormField(
+                                child: TextFormField(
+                                  controller: _monthController,
                                   decoration: const InputDecoration(
                                     isDense: true,
-                                    label: Text('Month'),
+                                    border: InputBorder.none,
+                                    label: Text('Month #'),
                                   ),
-                                  items: _validMonths.map((m) {
-                                    return DropdownMenuItem(
-                                      value: m,
-                                      child: Text('$m')
-                                    );
-                                  }).toList(), 
                                   validator: (value) {
-                                      if (value == null) {
-                                        return 'Please select a month';
-                                      }
-                                      return null;
-                                  },
-                                  onChanged: (value) {}, // required
-                                  onSaved: (value) {
-                                    widget.currentUser.month = value!;
-                                  },
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              flex: 1,
-                              child: StyledFormField(
-                                child: DropdownButtonFormField(
-                                  decoration: const InputDecoration(
-                                    isDense: true,
-                                    label: Text('Day'),
-                                  ),
-                                  items: _validDays.map((d) {
-                                    return DropdownMenuItem(
-                                      value: d,
-                                      child: Text('$d')
-                                    );
-                                  }).toList(), 
-                                  validator: (value) {
-                                      if (value == null) {
-                                        return 'Please select a date';
-                                      }
-                                      return null;
-                                  },
-                                  onChanged: (value) {}, // required
-                                  onSaved: (value) { 
-                                    widget.currentUser.day = value!;
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a month';
+                                    }
+                                    final int? month = int.tryParse(value);
+                                    if (month == null || month < 1 || month > 12) {
+                                      return 'Must be 1-12';
+                                    }
+                                    return null; 
                                   },
                                 ),
                               ),
@@ -215,6 +194,31 @@ class _SignUpState extends State<SignUp> {
                               flex: 1,
                               child: StyledFormField(
                                 child: TextFormField(
+                                  controller: _dayController,
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    label: Text('Day #'),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter day';
+                                    }
+                                    final int? day = int.tryParse(value);
+                                    if (day == null || day < 1 || day > 31) {
+                                      return 'Must be 1-31';
+                                    }
+                                    return null; 
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              flex: 1,
+                              child: StyledFormField(
+                                child: TextFormField(
+                                  controller: _yearController,
                                   decoration: const InputDecoration(
                                     isDense: true,
                                     border: InputBorder.none,
@@ -230,9 +234,6 @@ class _SignUpState extends State<SignUp> {
                                     }
                                     return null; 
                                   },
-                                  onSaved: (value) {
-                                    widget.currentUser.year = value!;
-                                  },
                                 ),
                               ),
                             ),
@@ -241,17 +242,18 @@ class _SignUpState extends State<SignUp> {
                         const SizedBox(height: _paddingHeight),
                         StyledFormField(
                           child: TextFormField(
+                              controller: _confirmPasswordController,
                               keyboardType: TextInputType.visiblePassword,
-                              obscureText: _obscured,
+                              obscureText: obscure._value,
                               decoration: InputDecoration(
                                 isDense: true,
                                 border: InputBorder.none,
                                 label: const Text('Password'),
                                 hintText: 'Password',
                                 suffixIcon: IconButton(
-                                  onPressed: _toggleObscured,
+                                  onPressed: () => obscure.toggle(),
                                   icon: Icon(
-                                    _obscured
+                                    obscure._value
                                         ? Icons.visibility_rounded
                                         : Icons.visibility_off_rounded,
                                     size: 24,
@@ -266,14 +268,12 @@ class _SignUpState extends State<SignUp> {
                                 } 
                                 return null;
                               },
-                              onChanged: (value) {
-                                _confirmPassword = value;
-                              },
                             ),
                         ),
                         const SizedBox(height: _paddingHeight),
                         StyledFormField(
                           child: TextFormField(
+                              controller: _passwordController,
                               keyboardType: TextInputType.visiblePassword,
                               obscureText: true,
                               decoration: const InputDecoration(
@@ -285,13 +285,10 @@ class _SignUpState extends State<SignUp> {
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please confirm password';
-                                } else if (value != _confirmPassword) {
+                                } else if (value != _confirmPasswordController.text) {
                                   return 'Passwords do not match';
                                 } 
                                 return null;
-                              },
-                              onSaved: (value) {
-                                widget.currentUser.password = value!;
                               },
                             ),
                         ),
@@ -302,22 +299,16 @@ class _SignUpState extends State<SignUp> {
                             onPressed: () {
                               if (_formGlobalKey.currentState!.validate()) {
                                 _formGlobalKey.currentState!.save();
-                                if (!widget.validUsers.contains(widget.currentUser)) {
-                                  widget.validUsers.add(widget.currentUser);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Success(currentUser: widget.currentUser, validUsers: widget.validUsers),
-                                    ),
-                                  );
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SignIn(currentUser: widget.currentUser, validUsers: widget.validUsers),
-                                    ),
-                                  );
-                                }
+                                userProvider.signUp(User(
+                                  firstName: _firstNameController.text,
+                                  lastName: _lastNameController.text,
+                                  email: _emailController.text,
+                                  month: _monthController.text,
+                                  day: _dayController.text,
+                                  year: _yearController.text,
+                                  password: _passwordController.text,
+                                ));
+                                Navigator.pushNamed(context, '/success');
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -345,12 +336,9 @@ class _SignUpState extends State<SignUp> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     Checkbox(
-                                      value: _checkboxValue,
+                                      value: checkbox._value,
                                       onChanged: (value) {
-                                        setState(() {
-                                          _checkboxValue = value!;
-                                          state.didChange(value);
-                                        });
+                                        checkbox.toggle();
                                       }),
                                     Row(
                                       children: <Widget>[
@@ -385,7 +373,7 @@ class _SignUpState extends State<SignUp> {
                             );
                           },
                           validator: (value) {
-                            if (!_checkboxValue) {
+                            if (!checkbox._value) {
                               return 'Please accept the terms to create an account';
                             } else {
                               return null;
@@ -414,12 +402,7 @@ class _SignUpState extends State<SignUp> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignIn(currentUser: widget.currentUser, validUsers: widget.validUsers),
-                            ),
-                          );
+                          Navigator.pushReplacementNamed(context, '/signin');
                         }, 
                       ),
                     ],

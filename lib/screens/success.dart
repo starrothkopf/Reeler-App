@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_signup/models/user.dart';
-import 'package:flutter_signup/screens/sign_in.dart';
+import 'package:flutter_signup/models/user_provider.dart';
+import 'package:provider/provider.dart';
 
-class Success extends StatefulWidget {
-  final User currentUser;
-  final List<User> validUsers;
-
-  const Success({super.key, required this.currentUser, required this.validUsers});
-
-  @override
-  State<Success> createState() => _SuccessState();
-}
-
-class _SuccessState extends State<Success> {
+class Success extends StatelessWidget {
+  const Success({super.key});
 
   static const Color _tempoOrange =  Color.fromARGB(255, 248, 84, 4);
 
   @override
   Widget build(BuildContext context) {
+    var user = context.watch<UserProvider>();
+
+    if (user.currentUser == null) {
+      Navigator.pushReplacementNamed(context, '/signin');
+    }
+
     return Scaffold(
       body: Center(
         child: Container(
@@ -32,7 +29,7 @@ class _SuccessState extends State<Success> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Hi, ${widget.currentUser.firstName}!', 
+                'Hi, ${user.currentUser?.firstName}!', 
                 style: const TextStyle(
                   fontSize: 40.0, 
                   color: Colors.white,
@@ -90,7 +87,7 @@ class _SuccessState extends State<Success> {
                     ),
                     const SizedBox(height: 15),
                     Text(
-                      '${widget.currentUser.firstName} ${widget.currentUser.lastName}',
+                      '${user.currentUser?.firstName} ${user.currentUser?.lastName}',
                       style: const TextStyle(
                         color: _tempoOrange,
                         fontSize: 18.0,
@@ -101,7 +98,7 @@ class _SuccessState extends State<Success> {
                       children: <Widget>[
                         const Icon(Icons.mail, color: _tempoOrange, size: 12),
                         Text(
-                          ' ${widget.currentUser.email}',
+                          ' ${user.currentUser?.email}',
                           style: const TextStyle(
                             color: _tempoOrange,
                             fontSize: 13.0,
@@ -111,7 +108,7 @@ class _SuccessState extends State<Success> {
                       ],
                     ),
                     Text(
-                      '${widget.currentUser.month}/${widget.currentUser.day}/${widget.currentUser.year}',
+                      '${user.currentUser?.month}/${user.currentUser?.day}/${user.currentUser?.year}',
                       style: const TextStyle(
                         color: _tempoOrange,
                         fontSize: 13.0,
@@ -163,22 +160,7 @@ class _SuccessState extends State<Success> {
                             ],
                           ),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignIn(
-                                  currentUser: User( // pass a blank user
-                                  firstName: '',
-                                  lastName: '',
-                                  email: '',
-                                  month: 1,
-                                  day: 1,
-                                  year: '',
-                                  password: '',
-                                ),
-                                validUsers: widget.validUsers),
-                              ),
-                            );
+                            Navigator.pushReplacementNamed(context, '/signin');
                           }, 
                         ),
                       ],
@@ -198,7 +180,7 @@ class _SuccessState extends State<Success> {
               const SizedBox(height: 10),
               Expanded(
                 child: ListView.builder(
-                  itemCount: widget.validUsers.length,
+                  itemCount: user.validUsers.length,
                   itemBuilder: (context, index) {
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
@@ -209,17 +191,9 @@ class _SuccessState extends State<Success> {
                       ),
                       child: ListTile(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Success(
-                                currentUser: widget.validUsers[index],
-                                validUsers: widget.validUsers,
-                              ),
-                            ),
-                          );
+                          user.currentUser = user.validUsers[index];
                         },
-                        title: Text('${widget.validUsers[index].firstName} ${widget.validUsers[index].lastName}'),
+                        title: Text('${user.validUsers[index].firstName} ${user.validUsers[index].lastName}'),
                         leading: const CircleAvatar(
                           backgroundImage: AssetImage('profile.png'),
                         ),
@@ -227,7 +201,7 @@ class _SuccessState extends State<Success> {
                           icon: const Icon(Icons.delete),
                           color: Colors.grey[600],
                           onPressed: () {
-                            widget.validUsers.remove(widget.validUsers[index]);
+                            user.remove(user.validUsers[index]);
                           },
                         ),
                       ),
