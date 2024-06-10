@@ -1,3 +1,5 @@
+import 'package:flutter_signup/models/movie.dart';
+
 class User {
   String firstName;
   String lastName;
@@ -6,6 +8,7 @@ class User {
   String day;
   String year;
   String password;
+  List<Movie> favorites;
 
   User({required this.firstName, 
         required this.lastName, 
@@ -13,6 +16,7 @@ class User {
         required this.month, 
         required this.day, 
         required this.year,
-        required this.password});
+        required this.password,
+        required this.favorites});
         
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_signup/models/movie.dart';
 import 'user.dart';
 
 class UserProvider with ChangeNotifier {
@@ -52,6 +53,20 @@ class UserProvider with ChangeNotifier {
       currentUser = null; // Set currentUser to null if the removed user was the current user
     }
     notifyListeners(); // rebuild the widgets that depend on this model
+  }
+
+  void favorite(User user, Movie movie) {
+    if (!user.favorites.contains(movie)) {
+      user.favorites.add(movie);
+      notifyListeners();
+    }
+  }
+
+  void unfavorite(User user, Movie movie) {
+    if (user.favorites.contains(movie)) {
+      user.favorites.remove(movie);
+      notifyListeners();
+    }
   }
 
 }

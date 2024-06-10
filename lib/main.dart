@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_signup/models/user_provider.dart';
+import 'package:flutter_signup/screens/movies.dart';
 import 'package:flutter_signup/screens/sign_in.dart';
 import 'package:flutter_signup/screens/sign_up.dart';
 import 'package:flutter_signup/screens/success.dart';
@@ -18,7 +19,8 @@ void main() => runApp(
       routes: {
         '/': (context) => SignUp(),
         '/signin': (context) => SignIn(),
-        '/success': (context) => Success(),
+        '/movies': (context) => const Movies(),
+        '/success': (context) => const Success(),
       }
     ),
   ),

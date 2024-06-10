@@ -9,9 +9,9 @@ class Success extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var user = context.watch<UserProvider>();
+    var userProvider = context.watch<UserProvider>();
 
-    if (user.currentUser == null) {
+    if (userProvider.currentUser == null) {
       Navigator.pushReplacementNamed(context, '/signin');
     }
 
@@ -29,7 +29,7 @@ class Success extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Hi, ${user.currentUser?.firstName}!', 
+                'Hi, ${userProvider.currentUser?.firstName}!', 
                 style: const TextStyle(
                   fontSize: 40.0, 
                   color: Colors.white,
@@ -38,7 +38,7 @@ class Success extends StatelessWidget {
               ),
               const SizedBox(height: 15),
               Container(
-                height: 310,
+                height: 350,
                 padding: const EdgeInsets.all(40.0),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -87,7 +87,7 @@ class Success extends StatelessWidget {
                     ),
                     const SizedBox(height: 15),
                     Text(
-                      '${user.currentUser?.firstName} ${user.currentUser?.lastName}',
+                      '${userProvider.currentUser?.firstName} ${userProvider.currentUser?.lastName}',
                       style: const TextStyle(
                         color: _tempoOrange,
                         fontSize: 18.0,
@@ -98,7 +98,7 @@ class Success extends StatelessWidget {
                       children: <Widget>[
                         const Icon(Icons.mail, color: _tempoOrange, size: 12),
                         Text(
-                          ' ${user.currentUser?.email}',
+                          ' ${userProvider.currentUser?.email}',
                           style: const TextStyle(
                             color: _tempoOrange,
                             fontSize: 13.0,
@@ -108,7 +108,7 @@ class Success extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      '${user.currentUser?.month}/${user.currentUser?.day}/${user.currentUser?.year}',
+                      '${userProvider.currentUser?.month}/${userProvider.currentUser?.day}/${userProvider.currentUser?.year}',
                       style: const TextStyle(
                         color: _tempoOrange,
                         fontSize: 13.0,
@@ -117,9 +117,18 @@ class Success extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     const Text(
-                      'Livin\' life at my own tempo!',
+                      'My favorite trending movies:',
                       style: TextStyle(
                         fontSize: 13.0,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: ListView.builder(
+                        itemCount: userProvider.currentUser!.favorites.length,
+                        itemBuilder: (context, index) {
+                          return Text(userProvider.currentUser!.favorites[index].title);
+                        }
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -127,19 +136,21 @@ class Success extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(backgroundColor: _tempoOrange),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/movies');
+                          },
+                          style: TextButton.styleFrom(backgroundColor: Colors.purple[800]),
                           child: const Row(
                             children: <Widget>[
                             Text(
-                              'Edit Profile ',
+                              'Select Movies ',
                               style: TextStyle(
                                 fontSize: 15.0,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            Icon(Icons.edit, color: Colors.white, size: 20),
+                            Icon(Icons.movie, color: Colors.white, size: 20),
                             ],
                           ),
                         ),
@@ -180,7 +191,7 @@ class Success extends StatelessWidget {
               const SizedBox(height: 10),
               Expanded(
                 child: ListView.builder(
-                  itemCount: user.validUsers.length,
+                  itemCount: userProvider.validUsers.length,
                   itemBuilder: (context, index) {
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
@@ -191,9 +202,9 @@ class Success extends StatelessWidget {
                       ),
                       child: ListTile(
                         onTap: () {
-                          user.currentUser = user.validUsers[index];
+                          userProvider.currentUser = userProvider.validUsers[index];
                         },
-                        title: Text('${user.validUsers[index].firstName} ${user.validUsers[index].lastName}'),
+                        title: Text('${userProvider.validUsers[index].firstName} ${userProvider.validUsers[index].lastName}'),
                         leading: const CircleAvatar(
                           backgroundImage: AssetImage('profile.png'),
                         ),
@@ -201,7 +212,7 @@ class Success extends StatelessWidget {
                           icon: const Icon(Icons.delete),
                           color: Colors.grey[600],
                           onPressed: () {
-                            user.remove(user.validUsers[index]);
+                            userProvider.remove(userProvider.validUsers[index]);
                           },
                         ),
                       ),

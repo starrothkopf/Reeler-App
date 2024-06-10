@@ -34,22 +34,6 @@ class SignUp extends StatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-
-  // final TextEditingController _emailController = TextEditingController();
-  // final VerifaliaService _verifaliaService = VerifaliaService();
-  // bool _isValid = false;
-
-  // void _verifyEmail(String email) async {
-  //   try {
-  //     final isValid = await _verifaliaService.verifyEmail(email);
-  //     setState(() {
-  //       _isValid = isValid;
-  //     });
-  //   } catch (e) {
-  //     print('Error verifying email: $e');
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -307,6 +291,7 @@ class SignUp extends StatelessWidget {
                                   day: _dayController.text,
                                   year: _yearController.text,
                                   password: _passwordController.text,
+                                  favorites: [],
                                 ));
                                 Navigator.pushNamed(context, '/success');
                               }
