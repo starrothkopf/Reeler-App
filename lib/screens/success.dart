@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_signup/models/user_provider.dart';
+import 'package:flutter_signup/states/auth_state.dart';
 import 'package:provider/provider.dart';
 
 class Success extends StatelessWidget {
@@ -9,7 +9,7 @@ class Success extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = context.watch<UserProvider>();
+    var userProvider = context.watch<AuthState>();
 
     if (userProvider.currentUser == null) {
       Navigator.pushReplacementNamed(context, '/signin');

@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_signup/models/movie.dart';
-import 'user.dart';
+import 'package:flutter_signup/models/movie_model.dart';
+import 'package:flutter_signup/states/base_state.dart';
+import '../models/user_model.dart';
 
-class UserProvider with ChangeNotifier {
+class AuthState extends BaseState {
   final List<User> _validUsers = [];
   User? _currentUser;
 

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_signup/widgets/styled_form_field.dart';
-import 'package:flutter_signup/models/user_provider.dart';
+import 'package:flutter_signup/states/auth_state.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatelessWidget {
   SignIn({super.key});
@@ -16,7 +17,12 @@ class SignIn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userProvider = Provider.of<AuthState>(context, listen: false);
+    final sharedPrefs = context.watch<SharedPreferences?>();
+
+    _emailController.text = sharedPrefs?.getString('email') ?? '';
+    _passwordController.text = sharedPrefs?.getString('password') ?? '';
+ 
     return Scaffold(
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_signup/models/user.dart';
-import 'package:flutter_signup/models/user_provider.dart';
+import 'package:flutter_signup/models/user_model.dart';
+import 'package:flutter_signup/states/auth_state.dart';
 import 'package:flutter_signup/widgets/styled_form_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 // import 'package:flutter_signup/services/email_verification.dart';
@@ -18,27 +19,47 @@ class BoolToggle with ChangeNotifier {
 }
 
 class SignUp extends StatelessWidget {
-  SignUp({super.key});
-
-  final _formGlobalKey = GlobalKey<FormState>();
+   SignUp({super.key});
 
   static const double _paddingHeight = 20.0;
   static const Color _tempoOrange =  Color.fromARGB(255, 248, 84, 4);
 
+
+  final _formGlobalKey = GlobalKey<FormState>();
+
   final TextEditingController _firstNameController = TextEditingController();
+
   final TextEditingController _lastNameController = TextEditingController();
+
   final TextEditingController _emailController = TextEditingController();
+
   final TextEditingController _monthController = TextEditingController();
+
   final TextEditingController _dayController = TextEditingController();
+
   final TextEditingController _yearController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
+
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userProvider = Provider.of<AuthState>(context, listen: false);
     final obscure = Provider.of<BoolToggle>(context);
     final checkbox = Provider.of<BoolToggle>(context);
+    final rememberMe = Provider.of<BoolToggle>(context);
+
+    final sharedPrefs = context.watch<SharedPreferences?>();
+
+    _firstNameController.text = sharedPrefs?.getString('firstName') ?? '';
+    _lastNameController.text = sharedPrefs?.getString('lastName') ?? '';
+    _emailController.text = sharedPrefs?.getString('email') ?? '';
+    _monthController.text = sharedPrefs?.getString('month') ?? '';
+    _dayController.text = sharedPrefs?.getString('day') ?? '';
+    _yearController.text = sharedPrefs?.getString('year') ?? '';
+    _passwordController.text = sharedPrefs?.getString('password') ?? '';
+    _confirmPasswordController.text = sharedPrefs?.getString('confirmPassword') ?? '';
     
     return Scaffold(
       body: SingleChildScrollView(
@@ -283,6 +304,18 @@ class SignUp extends StatelessWidget {
                             onPressed: () {
                               if (_formGlobalKey.currentState!.validate()) {
                                 _formGlobalKey.currentState!.save();
+
+                                if (rememberMe._value) {
+                                  sharedPrefs?.setString('firstName', _firstNameController.text);
+                                  sharedPrefs?.setString('lastName', _lastNameController.text);
+                                  sharedPrefs?.setString('email', _emailController.text);
+                                  sharedPrefs?.setString('month', _monthController.text);
+                                  sharedPrefs?.setString('day', _dayController.text);
+                                  sharedPrefs?.setString('year', _yearController.text);
+                                  sharedPrefs?.setString('password', _passwordController.text);
+                                  sharedPrefs?.setString('confirmPassword', _confirmPasswordController.text);
+                                }
+                                
                                 userProvider.signUp(User(
                                   firstName: _firstNameController.text,
                                   lastName: _lastNameController.text,
@@ -348,12 +381,21 @@ class SignUp extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                Text(
-                                  state.errorText ?? '',
-                                  style: TextStyle(
-                                    color: Colors.red[900],
-                                  ),
-                                )
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Checkbox(
+                                      value: rememberMe._value,
+                                      onChanged: (value) {
+                                        rememberMe.toggle();
+                                      }),
+                                    const Text(' Remember me?',
+                                      style: TextStyle(
+                                        fontSize: 13.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             );
                           },
@@ -369,6 +411,7 @@ class SignUp extends StatelessWidget {
                       ],
                     ),
                   ),
+                  SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,

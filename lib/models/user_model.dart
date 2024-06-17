@@ -1,4 +1,4 @@
-import 'package:flutter_signup/models/movie.dart';
+import 'package:flutter_signup/models/movie_model.dart';
 
 class User {
   String firstName;
