@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_signup/models/user_provider.dart';
+import 'package:flutter_signup/states/auth_state.dart';
+import 'package:flutter_signup/utility/api_constants.dart';
 import 'package:provider/provider.dart';
 
-class Success extends StatelessWidget {
-  const Success({super.key});
+class Home extends StatelessWidget {
+  const Home({super.key});
 
-  static const Color _tempoOrange =  Color.fromARGB(255, 248, 84, 4);
+  static const Color red = Color(0xFFe33030); // red
+  static const Color dark1 = Color(0xFF121212); // darkest
+  static const Color dark2 = Color(0xFF292929); // dark
+  static const Color silver = Color(0xFFa7a7a7); // silver
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = context.watch<UserProvider>();
+    var userProvider = context.watch<AuthState>();
 
     if (userProvider.currentUser == null) {
       Navigator.pushReplacementNamed(context, '/signin');
@@ -21,7 +25,7 @@ class Success extends StatelessWidget {
           padding: const EdgeInsets.all(40.0),
           margin: const EdgeInsets.all(20.0),
           decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 242, 172, 115),
+            
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
           ),
           child: Column(
@@ -38,11 +42,11 @@ class Success extends StatelessWidget {
               ),
               const SizedBox(height: 15),
               Container(
-                height: 350,
+                height: 330,
                 padding: const EdgeInsets.all(40.0),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  color: dark2,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -89,31 +93,23 @@ class Success extends StatelessWidget {
                     Text(
                       '${userProvider.currentUser?.firstName} ${userProvider.currentUser?.lastName}',
                       style: const TextStyle(
-                        color: _tempoOrange,
+                        color: Colors.white,
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                       )
                     ),
                     Row(
                       children: <Widget>[
-                        const Icon(Icons.mail, color: _tempoOrange, size: 12),
+                        const Icon(Icons.mail, color: red, size: 12),
                         Text(
                           ' ${userProvider.currentUser?.email}',
                           style: const TextStyle(
-                            color: _tempoOrange,
+                            color: silver,
                             fontSize: 13.0,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
-                    ),
-                    Text(
-                      '${userProvider.currentUser?.month}/${userProvider.currentUser?.day}/${userProvider.currentUser?.year}',
-                      style: const TextStyle(
-                        color: _tempoOrange,
-                        fontSize: 13.0,
-                        fontWeight: FontWeight.w500,
-                      ),
                     ),
                     const SizedBox(height: 5),
                     const Text(
@@ -127,7 +123,10 @@ class Success extends StatelessWidget {
                       child: ListView.builder(
                         itemCount: userProvider.currentUser!.favorites.length,
                         itemBuilder: (context, index) {
-                          return Text(userProvider.currentUser!.favorites[index].title);
+                          return CircleAvatar(
+                            radius: 20.0,
+                            backgroundImage: NetworkImage('${Constants.imageBaseUrl}${userProvider.currentUser!.favorites[index].posterPath}'),
+                          );
                         }
                       ),
                     ),
@@ -139,7 +138,7 @@ class Success extends StatelessWidget {
                           onPressed: () {
                             Navigator.pushNamed(context, '/movies');
                           },
-                          style: TextButton.styleFrom(backgroundColor: Colors.purple[800]),
+                          style: TextButton.styleFrom(backgroundColor: red),
                           child: const Row(
                             children: <Widget>[
                             Text(
@@ -156,7 +155,7 @@ class Success extends StatelessWidget {
                         ),
                         const SizedBox(width: 10),
                         TextButton(
-                          style: TextButton.styleFrom(backgroundColor: _tempoOrange),
+                          style: TextButton.styleFrom(backgroundColor: red),
                           child: const Row(
                             children: <Widget>[
                               Text(
@@ -177,47 +176,6 @@ class Success extends StatelessWidget {
                       ],
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 15),
-              const Text(
-                'My Profiles', 
-                style: TextStyle(
-                  fontSize: 20.0, 
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: userProvider.validUsers.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
-                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      ),
-                      child: ListTile(
-                        onTap: () {
-                          userProvider.currentUser = userProvider.validUsers[index];
-                        },
-                        title: Text('${userProvider.validUsers[index].firstName} ${userProvider.validUsers[index].lastName}'),
-                        leading: const CircleAvatar(
-                          backgroundImage: AssetImage('profile.png'),
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          color: Colors.grey[600],
-                          onPressed: () {
-                            userProvider.remove(userProvider.validUsers[index]);
-                          },
-                        ),
-                      ),
-                    );
-                  }
                 ),
               ),
             ],

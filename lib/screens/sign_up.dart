@@ -1,44 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_signup/models/user.dart';
-import 'package:flutter_signup/models/user_provider.dart';
+import 'package:flutter_signup/models/user_model.dart';
+import 'package:flutter_signup/states/auth_state.dart';
+import 'package:flutter_signup/states/bool_state.dart';
 import 'package:flutter_signup/widgets/styled_form_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
-// import 'package:flutter_signup/services/email_verification.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// toggle password show/hide and form checkbox
-class BoolToggle with ChangeNotifier {
-  bool _value = true;
-  bool get value => _value;
-  void toggle() { 
-    _value = !_value;
-    notifyListeners();
-  }
-}
-
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   SignUp({super.key});
 
-  final _formGlobalKey = GlobalKey<FormState>();
+  static const double _paddingHeight = 15.0;
+  static const Color _red = Color(0xFFe33030); // red
+  static const Color _silver = Color(0xFFa7a7a7);   // silver
 
-  static const double _paddingHeight = 20.0;
-  static const Color _tempoOrange =  Color.fromARGB(255, 248, 84, 4);
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+
+  late String _username;
+  late bool _rememberMe;
+
+  final _formGlobalKey = GlobalKey<FormState>();
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _monthController = TextEditingController();
-  final TextEditingController _dayController = TextEditingController();
-  final TextEditingController _yearController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  
+  @override
+    void initState() {
+      super.initState();
+      _loadPreferences();
+    }
+  
+  void _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username') ?? '';
+      _rememberMe = prefs.getBool('rememberMe') ?? false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final obscure = Provider.of<BoolToggle>(context);
-    final checkbox = Provider.of<BoolToggle>(context);
+    final userProvider = Provider.of<AuthState>(context, listen: false);
+    final obscure = Provider.of<BoolState>(context);
+    final checkbox = Provider.of<BoolState>(context);
     
     return Scaffold(
       body: SingleChildScrollView(
@@ -47,29 +59,25 @@ class SignUp extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Padding( 
-              padding: const EdgeInsets.all(_paddingHeight),
+              padding: const EdgeInsets.fromLTRB(80, 100, 80, 0),
               child: SizedBox(
-                height: 100,
-                child: Image.asset('assets/tempologo.jpg'),
+                height: 40,
+                child: Image.asset('assets/reeler_full.png'),
               ),
             ),
             Container(
               padding: const EdgeInsets.all(40.0),
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 248, 194, 133),
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
-              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   const Text(
-                    'Create Account',
+                    'Find films you\'ll love',
                     style: TextStyle(
-                      fontSize: 25.0,
+                      fontSize: 35.0,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: -1,
                     ),
                   ),
-                  const SizedBox(height: _paddingHeight),
+                  const SizedBox(height: 20),
                   Form(
                     key: _formGlobalKey,
                     child: Column(
@@ -124,7 +132,7 @@ class SignUp extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: _paddingHeight),
+                        const SizedBox(height: SignUp._paddingHeight),
                         StyledFormField(
                           child: TextFormField(
                               controller: _emailController,
@@ -145,90 +153,12 @@ class SignUp extends StatelessWidget {
                               },
                             ),
                         ),
-                        const SizedBox(height: 10),
-                        const Text('Date of Birth'),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 1,
-                              child: StyledFormField(
-                                child: TextFormField(
-                                  controller: _monthController,
-                                  decoration: const InputDecoration(
-                                    isDense: true,
-                                    border: InputBorder.none,
-                                    label: Text('Month #'),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter a month';
-                                    }
-                                    final int? month = int.tryParse(value);
-                                    if (month == null || month < 1 || month > 12) {
-                                      return 'Must be 1-12';
-                                    }
-                                    return null; 
-                                  },
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              flex: 1,
-                              child: StyledFormField(
-                                child: TextFormField(
-                                  controller: _dayController,
-                                  decoration: const InputDecoration(
-                                    isDense: true,
-                                    border: InputBorder.none,
-                                    label: Text('Day #'),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter day';
-                                    }
-                                    final int? day = int.tryParse(value);
-                                    if (day == null || day < 1 || day > 31) {
-                                      return 'Must be 1-31';
-                                    }
-                                    return null; 
-                                  },
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              flex: 1,
-                              child: StyledFormField(
-                                child: TextFormField(
-                                  controller: _yearController,
-                                  decoration: const InputDecoration(
-                                    isDense: true,
-                                    border: InputBorder.none,
-                                    label: Text('Year'),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter year';
-                                    }
-                                    final int? year = int.tryParse(value);
-                                    if (year == null || year < 1900 || year > 2024) {
-                                      return 'Please enter a valid year';
-                                    }
-                                    return null; 
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: _paddingHeight),
+                        const SizedBox(height: SignUp._paddingHeight),
                         StyledFormField(
                           child: TextFormField(
                               controller: _confirmPasswordController,
                               keyboardType: TextInputType.visiblePassword,
-                              obscureText: obscure._value,
+                              obscureText: obscure.value,
                               decoration: InputDecoration(
                                 isDense: true,
                                 border: InputBorder.none,
@@ -237,7 +167,7 @@ class SignUp extends StatelessWidget {
                                 suffixIcon: IconButton(
                                   onPressed: () => obscure.toggle(),
                                   icon: Icon(
-                                    obscure._value
+                                    obscure.value
                                         ? Icons.visibility_rounded
                                         : Icons.visibility_off_rounded,
                                     size: 24,
@@ -254,7 +184,7 @@ class SignUp extends StatelessWidget {
                               },
                             ),
                         ),
-                        const SizedBox(height: _paddingHeight),
+                        const SizedBox(height: SignUp._paddingHeight),
                         StyledFormField(
                           child: TextFormField(
                               controller: _passwordController,
@@ -276,7 +206,7 @@ class SignUp extends StatelessWidget {
                               },
                             ),
                         ),
-                        const SizedBox(height: _paddingHeight),
+                        const SizedBox(height: 30),
                         SizedBox(
                           width: double.infinity, // wide button
                           child: ElevatedButton(
@@ -287,30 +217,28 @@ class SignUp extends StatelessWidget {
                                   firstName: _firstNameController.text,
                                   lastName: _lastNameController.text,
                                   email: _emailController.text,
-                                  month: _monthController.text,
-                                  day: _dayController.text,
-                                  year: _yearController.text,
                                   password: _passwordController.text,
                                   favorites: [],
                                 ));
-                                Navigator.pushNamed(context, '/success');
+                                Navigator.pushNamed(context, '/home');
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _tempoOrange,
+                              backgroundColor: SignUp._red,
                               padding: const EdgeInsets.all(20.0),
                             ),
                             child: const Text(
-                              'Create Account',
+                              'SIGN UP',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 20.0,
+                                fontSize: 15.0,
+                                letterSpacing: 2,
                               ),
                             ),
                           ),
                         ),
-                      const SizedBox(height: _paddingHeight + 10),
+                      const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
                         child: FormField<bool>( // check terms and conditions
@@ -321,7 +249,8 @@ class SignUp extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     Checkbox(
-                                      value: checkbox._value,
+                                      activeColor: SignUp._silver,
+                                      value: checkbox.value,
                                       onChanged: (value) {
                                         checkbox.toggle();
                                       }),
@@ -335,8 +264,9 @@ class SignUp extends StatelessWidget {
                                         RichText(
                                           text: TextSpan(
                                             text: ' Terms & Conditions',
-                                            style: TextStyle(
-                                              color: Colors.purple[900],
+                                            style: const TextStyle(
+                                              fontFamily: 'CircularStd',
+                                              color: SignUp._silver,
                                               fontWeight: FontWeight.bold,
                                             ),
                                             recognizer: TapGestureRecognizer()
@@ -348,17 +278,11 @@ class SignUp extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                Text(
-                                  state.errorText ?? '',
-                                  style: TextStyle(
-                                    color: Colors.red[900],
-                                  ),
-                                )
                               ],
                             );
                           },
                           validator: (value) {
-                            if (!checkbox._value) {
+                            if (!checkbox.value) {
                               return 'Please accept the terms to create an account';
                             } else {
                               return null;
@@ -374,16 +298,12 @@ class SignUp extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       const Text('Already have an account?',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                        ),
                       ),
                       TextButton(
                         child: const Text(
-                          'Sign-In!',
+                          'Log In!',
                           style: TextStyle(
-                            fontSize: 18.0,
-                            color: _tempoOrange,
+                            color: SignUp._red,
                           ),
                         ),
                         onPressed: () {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_signup/states/auth_state.dart';
 import 'package:flutter_signup/widgets/styled_form_field.dart';
-import 'package:flutter_signup/models/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignIn extends StatelessWidget {
@@ -8,188 +8,157 @@ class SignIn extends StatelessWidget {
  
   final _formGlobalKey = GlobalKey<FormState>();
 
-  static const double _paddingHeight = 20.0;
-  static const Color _tempoOrange =  Color.fromARGB(255, 248, 84, 4);
+  static const double _paddingHeight = 15.0;
+  static const Color _red = Color(0xFFe33030); // red
+  static const Color _dark1 = Color(0xFF121212); // darkest
+  static const Color _dark2 = Color(0xFF292929); // dark
+  static const Color _silver = Color(0xFFa7a7a7); // silver
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userProvider = Provider.of<AuthState>(context, listen: false);
     return Scaffold(
-        body: Column(
+      body: Container(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(50,30,30,20),
-                  child: SizedBox(
-                    height: 100,
-                    child: Image.asset('assets/tempologo.jpg'),
+            const SizedBox(height: 50),
+            SizedBox(
+              height: 40,
+              child: Image.asset('assets/reeler_full.png'),
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Back to the cinema',
+              style: TextStyle(
+                fontSize: 35.0,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -1,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Form(
+              key: _formGlobalKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  StyledFormField(
+                    child: TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          border: InputBorder.none,
+                          label: Text('Email'),
+                          hintText: 'Email',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter email';
+                          } else if (!value.contains('@') || !value.contains('.')) { // _isValid
+                            return 'Please enter a valid email';
+                          } 
+                          return null;
+                        },
+                      ),
                   ),
+                const SizedBox(height: _paddingHeight),
+                StyledFormField(
+                  child: TextFormField(
+                      controller: _passwordController,
+                      keyboardType: TextInputType.visiblePassword,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
+                        label: const Text('Password'),
+                        hintText: 'Password',
+                        suffixIcon: TextButton(
+                          onPressed: () {
+                            // Sending email to ${widget.currentUser.email}
+                          },
+                          child: const Text(
+                            'Forgot?',
+                            style: TextStyle(
+                              color: _silver,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter password';
+                        } else if (value.length < 8) {
+                          return 'Password must be at least 8 characters';
+                        } 
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  SizedBox(
+                    width: double.infinity, // wide button
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formGlobalKey.currentState!.validate()) {
+                          _formGlobalKey.currentState!.save();
+                          bool attempt = userProvider.signIn(_emailController.text, _passwordController.text);
+                          if (attempt) {
+                            Navigator.pushNamed(context, '/home');
+                          } else {
+                            Navigator.pushReplacementNamed(context, '/signup');
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _red,
+                        padding: const EdgeInsets.all(20.0),
+                      ),
+                      child: const Text(
+                        'LOG IN',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15.0,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 25),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                const Text('Don\'t have an account?',
                 ),
-                SizedBox(
-                  height: 150,
-                  child: Image.asset('assets/tempokey.png'),
+                TextButton(
+                  child: const Text(
+                    'Sign Up!',
+                    style: TextStyle(
+                      color: _red,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/signup');
+                  }, 
                 ),
               ],
             ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(40.0, 40.0, 40.0, 0),
-                decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 248, 194, 133),
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Text(
-                      'Sign-In',
-                      style: TextStyle(
-                        fontSize: 25.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: _paddingHeight),
-                    Form(
-                      key: _formGlobalKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                           const Text('Email', style: TextStyle(fontSize: 18.0)),
-                          const SizedBox(height: 8),
-                          StyledFormField(
-                            child: TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: const InputDecoration(
-                                  isDense: true,
-                                  border: InputBorder.none,
-                                  label: Text('Email ID'),
-                                  hintText: 'Email ID',
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter email';
-                                  } else if (!value.contains('@') || value.length < 6) {
-                                    return 'Please enter a valid email';
-                                  } 
-                                  return null;
-                                },
-                              ),
-                          ),
-                          const SizedBox(height: _paddingHeight),
-                          const Text('Password', style: TextStyle(fontSize: 18.0)),
-                          const SizedBox(height: 8),
-                          StyledFormField(
-                            child: TextFormField(
-                                controller: _passwordController,
-                                keyboardType: TextInputType.visiblePassword,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  border: InputBorder.none,
-                                  label: const Text('Enter Password'),
-                                  hintText: 'Enter Password',
-                                  suffixIcon: TextButton(
-                                    onPressed: () {
-                                      // Sending email to ${widget.currentUser.email}
-                                    },
-                                    child: const Text(
-                                      'Forgot?',
-                                      style: TextStyle(
-                                        color: _tempoOrange,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter password';
-                                  } else if (value.length < 8) {
-                                    return 'Password must be at least 8 characters';
-                                  } 
-                                  return null;
-                                },
-                              ),
-                          ),
-                          const SizedBox(height: _paddingHeight),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (_formGlobalKey.currentState!.validate()) {
-                                  _formGlobalKey.currentState!.save();
-                                  if (userProvider.signIn(_emailController.text, _passwordController.text)) {
-                                    Navigator.pushNamed(context, '/success');
-                                  } else {
-                                    Navigator.pushReplacementNamed(context, '/');
-                                  }
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _tempoOrange,
-                                padding: const EdgeInsets.all(20.0),
-                              ),
-                              child: const Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        const SizedBox(height: _paddingHeight + 10),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            const Text('Don\'t have an account?',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
-                            ),
-                            TextButton(
-                              child: const Text(
-                                'Sign-Up!',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  color: _tempoOrange,
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(context, '/');
-                              }, 
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 80,
-                          child: Image.asset('assets/tempobuddies.png')),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
+      ),
     );
   }
 }

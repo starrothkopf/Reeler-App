@@ -38,6 +38,7 @@ dependencies:
   url_launcher: ^6.3.0
   provider: ^6.1.2
   http: ^1.2.1
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -77,12 +78,17 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+    - family: CircularStd
+      fonts:
+        - asset: assets/CircularStd-Light.otf
+          weight: 200
+        - asset: assets/CircularStd-Medium.otf
+          weight: 500
+        - asset: assets/CircularStd-Bold.otf
+          weight: 700
+        - asset: assets/CircularStd-Black.otf
+          weight: 900
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

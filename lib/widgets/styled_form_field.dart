@@ -6,14 +6,11 @@ class StyledFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  const Color dark2 = Color(0xFF292929); // dark
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 250, 217, 181),
-        border: Border.all(
-          color:const Color.fromARGB(255, 246, 167, 110),
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(12.0),
+        color: dark2,
+        borderRadius: BorderRadius.circular(30.0),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20.0, 5, 20.0, 5),

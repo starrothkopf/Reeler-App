@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_signup/models/movie.dart';
-import 'package:flutter_signup/models/user_provider.dart';
+import 'package:flutter_signup/models/movie_model.dart';
+import 'package:flutter_signup/states/auth_state.dart';
+import 'package:flutter_signup/utility/api_constants.dart';
 import 'package:provider/provider.dart';
 
 class Movies extends StatefulWidget {
@@ -32,7 +33,9 @@ class _MoviesState extends State<Movies> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
+    final userProvider = Provider.of<AuthState>(context);
+    final favoritesProvider = Provider.of<AuthState>(context);
+
     return Scaffold(
       body: Center(
         child: Container(
@@ -99,8 +102,8 @@ class _MoviesState extends State<Movies> {
                         trailing: IconButton(
                           onPressed: () {
                             userProvider.currentUser!.favorites.contains(movie)
-                              ? userProvider.unfavorite(userProvider.currentUser!, movie)
-                              : userProvider.favorite(userProvider.currentUser!, movie);
+                              ? favoritesProvider.unfavorite(userProvider.currentUser!, movie)
+                              : favoritesProvider.favorite(userProvider.currentUser!, movie);
                           }, 
                           icon: Icon(
                             Icons.star_rounded, 
