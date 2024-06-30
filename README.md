@@ -1,4 +1,4 @@
-# flutter_signup
+# Reeler: Spotify UI For Movies with Flutter
 
 This Flutter project provides a comprehensive sign-up form implementation with validation and user-friendly features. It includes:
 - Input fields for user details such as first name, last name, email, and password.
