@@ -5,7 +5,7 @@ class Init extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  const Color red = Color(0xFFe33030); // red
+  const Color red = Color(0xFFe33030);
   const Color dark1 = Color(0xFF121212); // darkest
     return Scaffold(
       body: Center(
@@ -22,7 +22,7 @@ class Init extends StatelessWidget {
               'Discover curated films.',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 28.0,
+                fontSize: 25.0,
                 letterSpacing: -1,
               ),
             ),
@@ -30,13 +30,13 @@ class Init extends StatelessWidget {
               'Share with friends on Reeler.',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 28.0,
+                fontSize: 25.0,
                 letterSpacing: -1,
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 25),
             SizedBox(
-              width: 400,
+              width: 320,
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, '/signup');

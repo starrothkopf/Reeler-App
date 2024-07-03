@@ -72,7 +72,7 @@ class _SignUpState extends State<SignUp> {
                   const Text(
                     'Find films you\'ll love',
                     style: TextStyle(
-                      fontSize: 35.0,
+                      fontSize: 33.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -1,
                     ),
@@ -220,7 +220,7 @@ class _SignUpState extends State<SignUp> {
                                   password: _passwordController.text,
                                   favorites: [],
                                 ));
-                                Navigator.pushNamed(context, '/home');
+                                Navigator.pushNamed(context, '/main');
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -254,7 +254,8 @@ class _SignUpState extends State<SignUp> {
                                       onChanged: (value) {
                                         checkbox.toggle();
                                       }),
-                                    Row(
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         const Text(' I have read and agree to the',
                                           style: TextStyle(
@@ -301,9 +302,10 @@ class _SignUpState extends State<SignUp> {
                       ),
                       TextButton(
                         child: const Text(
-                          'Log In!',
+                          'Log In',
                           style: TextStyle(
                             color: SignUp._red,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         onPressed: () {

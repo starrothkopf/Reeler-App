@@ -34,7 +34,7 @@ class SignIn extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             const Text(
-              'Back to the cinema',
+              'Back at the cinema',
               style: TextStyle(
                 fontSize: 35.0,
                 fontWeight: FontWeight.bold,
@@ -112,7 +112,7 @@ class SignIn extends StatelessWidget {
                           _formGlobalKey.currentState!.save();
                           bool attempt = userProvider.signIn(_emailController.text, _passwordController.text);
                           if (attempt) {
-                            Navigator.pushNamed(context, '/home');
+                            Navigator.pushNamed(context, '/main');
                           } else {
                             Navigator.pushReplacementNamed(context, '/signup');
                           }
@@ -145,9 +145,10 @@ class SignIn extends StatelessWidget {
                 ),
                 TextButton(
                   child: const Text(
-                    'Sign Up!',
+                    'Sign Up',
                     style: TextStyle(
                       color: _red,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   onPressed: () {
